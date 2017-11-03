@@ -7,6 +7,8 @@ namespace CSCore.Ffmpeg
     {
         private readonly unsafe AVStream* _stream;
 
+        private readonly FfmpegChannelLayouts ChannelLayout; 
+
         public unsafe AVStream Stream
         {
             get
@@ -56,8 +58,13 @@ namespace CSCore.Ffmpeg
                     throw new NotSupportedException("Audio Sample Format not supported.");
             }
 
-            var waveFormat = new WaveFormat(_stream->codec->sample_rate, bitsPerSample, _stream->codec->channels,
-                encoding);
+            var waveFormat = new WaveFormat(
+                _stream->codec->sample_rate,
+                bitsPerSample,
+                _stream->codec->channels,
+                encoding,
+                ChannelLayout
+                );
             return waveFormat;
         }
 
@@ -69,6 +76,9 @@ namespace CSCore.Ffmpeg
             _stream = (AVStream*)stream;
 
             var avCodecContext = _stream->codec;
+
+            ChannelLayout = (FfmpegChannelLayouts)avCodecContext->channel_layout;
+
             var decoder = FfmpegCalls.AvCodecFindDecoder(avCodecContext->codec_id);
             //will the codeccontext be freed by avformat_close_input automatically?
             FfmpegCalls.AvCodecOpen(avCodecContext, decoder);

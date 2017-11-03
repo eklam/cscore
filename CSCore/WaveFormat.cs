@@ -21,6 +21,8 @@ namespace CSCore
         private short _bitsPerSample;
         private short _extraSize;
 
+        private FfmpegChannelLayouts _channelLayout;
+
         /// <summary>
         ///     Gets the number of channels in the waveform-audio data. Mono data uses one channel and stereo data uses two
         ///     channels.
@@ -93,6 +95,14 @@ namespace CSCore
         }
 
         /// <summary>
+        ///     Get the ChannelLayout
+        /// </summary>
+        public FfmpegChannelLayouts ChannelLayout
+        {
+            get { return _channelLayout; }
+        }
+
+        /// <summary>
         ///     Gets the number of bytes, used to store one sample.
         /// </summary>
         public virtual int BytesPerSample
@@ -134,7 +144,7 @@ namespace CSCore
         /// <param name="bits">Number of bits, used to store one sample.</param>
         /// <param name="channels">Number of channels in the waveform-audio data.</param>
         public WaveFormat(int sampleRate, int bits, int channels)
-            : this(sampleRate, bits, channels, AudioEncoding.Pcm)
+            : this(sampleRate, bits, channels, AudioEncoding.Pcm, FfmpegChannelLayouts.UNDEFINED)
         {
         }
 
@@ -146,7 +156,20 @@ namespace CSCore
         /// <param name="channels">Number of channels in the waveform-audio data.</param>
         /// <param name="encoding">Format type or encoding of the wave format.</param>
         public WaveFormat(int sampleRate, int bits, int channels, AudioEncoding encoding)
-            : this(sampleRate, bits, channels, encoding, 0)
+            : this(sampleRate, bits, channels, encoding, 0, FfmpegChannelLayouts.UNDEFINED)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WaveFormat" /> class.
+        /// </summary>
+        /// <param name="sampleRate">Samples per second.</param>
+        /// <param name="bits">Number of bits, used to store one sample.</param>
+        /// <param name="channels">Number of channels in the waveform-audio data.</param>
+        /// <param name="encoding">Format type or encoding of the wave format.</param>
+        /// <param name="channelLayout">Channel layout in the waveform-audio data.</param>
+        public WaveFormat(int sampleRate, int bits, int channels, AudioEncoding encoding, FfmpegChannelLayouts channelLayout)
+            : this(sampleRate, bits, channels, encoding, 0, channelLayout)
         {
         }
 
@@ -159,6 +182,20 @@ namespace CSCore
         /// <param name="encoding">Format type or encoding of the wave format.</param>
         /// <param name="extraSize">Size (in bytes) of extra information. This value is mainly used for marshalling.</param>
         public WaveFormat(int sampleRate, int bits, int channels, AudioEncoding encoding, int extraSize)
+            : this(sampleRate, bits, channels, encoding, extraSize, FfmpegChannelLayouts.UNDEFINED)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WaveFormat" /> class.
+        /// </summary>
+        /// <param name="sampleRate">Samples per second.</param>
+        /// <param name="bits">Number of bits, used to store one sample.</param>
+        /// <param name="channels">Number of channels in the waveform-audio data.</param>
+        /// <param name="encoding">Format type or encoding of the wave format.</param>
+        /// <param name="extraSize">Size (in bytes) of extra information. This value is mainly used for marshalling.</param>
+        /// <param name="channelLayout">Channel layout in the waveform-audio data.</param>
+        public WaveFormat(int sampleRate, int bits, int channels, AudioEncoding encoding, int extraSize, FfmpegChannelLayouts channelLayout)
         {
             if (sampleRate < 1)
                 throw new ArgumentOutOfRangeException("sampleRate");
@@ -172,6 +209,7 @@ namespace CSCore
             _channels = (short) channels;
             _encoding = encoding;
             _extraSize = (short) extraSize;
+            _channelLayout = channelLayout;
 
 // ReSharper disable once DoNotCallOverridableMethodsInConstructor
             UpdateProperties();

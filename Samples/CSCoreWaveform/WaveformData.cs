@@ -11,17 +11,29 @@ namespace CSCoreWaveform
         private const int NumberOfPoints = 2000;
         public static long Length;
 
-        public static async Task<float[][]> GetData(IWaveSource waveSource)
+        public static async Task<ISampleSource> GetSampleSource(IWaveSource waveSource)
         {
             if (waveSource == null)
                 throw new ArgumentNullException("waveSource");
 
             return await Task.Run(() =>
             {
-                var sampleSource = new InterruptDisposeChainSource(waveSource).ToSampleSource();
+                return new InterruptDisposeChainSource(waveSource).ToSampleSource();
+            });
+        }
 
+        public static async Task<float[][]> GetData(IWaveSource waveSource)
+        {
+            var sampleSource = await GetSampleSource(waveSource);
+            return await GetData(sampleSource);
+        }
+
+        public static async Task<float[][]> GetData(ISampleSource sampleSource)
+        {
+            return await Task.Run(() =>
+            {
                 var channels = sampleSource.WaveFormat.Channels;
-                var blockSize = (int) (sampleSource.Length / channels / NumberOfPoints);
+                var blockSize = (int)(sampleSource.Length / channels / NumberOfPoints);
                 var waveformDataChannels = new WaveformDataChannel[channels];
                 for (var i = 0; i < channels; i++)
                 {

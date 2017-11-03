@@ -106,7 +106,7 @@ namespace CSCore
         /// </param>
         /// <param name="subFormat">Subformat of the data. This value will get applied to the <see cref="SubFormat" /> property.</param>
         public WaveFormatExtensible(int sampleRate, int bits, int channels, Guid subFormat)
-            : base(sampleRate, bits, channels, AudioEncoding.Extensible, WaveFormatExtensibleExtraSize)
+            : base(sampleRate, bits, channels, AudioEncoding.Extensible, WaveFormatExtensibleExtraSize, FfmpegChannelLayouts.UNDEFINED)
         {
             _samplesUnion = (short) bits;
             _subFormat = SubTypeFromWaveFormat(this);

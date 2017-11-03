@@ -57,30 +57,31 @@ namespace CSCore.Ffmpeg
 
         public Dictionary<string,string> Metadata { get; private set; }
 
-        public unsafe AvFormatContext(FfmpegStream stream)
+        public unsafe AvFormatContext(FfmpegStream stream, int? streamIndex = null)
         {
             _formatContext = FfmpegCalls.AvformatAllocContext();
             fixed (AVFormatContext** pformatContext = &_formatContext)
             {
                 FfmpegCalls.AvformatOpenInput(pformatContext, stream.AvioContext);
             }
-            Initialize();
+            Initialize(streamIndex);
         }
 
-        public unsafe AvFormatContext(string url)
+        public unsafe AvFormatContext(string url, int? streamIndex = null)
         {
             _formatContext = FfmpegCalls.AvformatAllocContext();
             fixed (AVFormatContext** pformatContext = &_formatContext)
             {
                 FfmpegCalls.AvformatOpenInput(pformatContext, url);
             }
-            Initialize();
+            Initialize(streamIndex);
         }
 
-        private unsafe void Initialize()
+        private unsafe void Initialize(int? streamIndex)
         {
             FfmpegCalls.AvFormatFindStreamInfo(_formatContext);
-            BestAudioStreamIndex = FfmpegCalls.AvFindBestStreamInfo(_formatContext);
+
+            BestAudioStreamIndex = streamIndex ?? FfmpegCalls.AvFindBestStreamInfo(_formatContext);
              _stream = new AvStream((IntPtr)_formatContext->streams[BestAudioStreamIndex]);
 
             Metadata = new Dictionary<string, string>();

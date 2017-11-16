@@ -73,12 +73,12 @@ namespace CSCore.Ffmpeg
         ///     or
         ///     Audio Sample Format not supported.
         /// </exception>
-        public FfmpegIndexedStreamDecoder(Stream stream, int streamIndex)
+        public FfmpegIndexedStreamDecoder(Stream stream, int streamIndex, bool closeOriginalStream)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream");
 
-            _ffmpegStream = new FfmpegStream(stream);
+            _ffmpegStream = new FfmpegStream(stream, closeOriginalStream);
             _formatContext = new AvFormatContext(_ffmpegStream, streamIndex);
             Initialize();
         }

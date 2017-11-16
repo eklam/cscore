@@ -10,7 +10,7 @@ namespace CSCore.Ffmpeg
 
         public AvioContext AvioContext { get; private set; }
 
-        public FfmpegStream(Stream stream)
+        public FfmpegStream(Stream stream, bool closeOriginalStream = false)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream");
@@ -19,8 +19,8 @@ namespace CSCore.Ffmpeg
 
             _stream = stream;
 
-            AvioContext = new AvioContext(ReadDataCallback, 
-                stream.CanSeek ? new FfmpegCalls.AvioSeek(SeekCallback) : null, 
+            AvioContext = new AvioContext(ReadDataCallback,
+                stream.CanSeek ? new FfmpegCalls.AvioSeek(SeekCallback) : null,
                 stream.CanWrite ? new FfmpegCalls.AvioWriteData(WriteDataCallback) : null);
         }
 
@@ -78,6 +78,11 @@ namespace CSCore.Ffmpeg
         public void Dispose()
         {
             GC.SuppressFinalize(this);
+
+            if (_stream != null)
+            {
+                _stream.Dispose();
+            }
 
             if (AvioContext != null)
             {
